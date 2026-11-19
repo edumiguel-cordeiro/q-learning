@@ -1,4 +1,3 @@
-
 {
   description = "Breve flake de ambiente haskell.";
 
@@ -8,18 +7,20 @@
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
+      haskellPackages = pkgs.haskell.packages.ghc910;
 
       hls = pkgs.haskell-language-server.override {
         supportedGhcVersions = [ "910" ];
       };
+      hpack = haskellPackages.hpack_0_39_1;
     in
     {
       devShells.${system}.default = pkgs.mkShell {
-        packages = with pkgs; [
-          ghc
-          cabal-install
+        packages = [
+          pkgs.ghc
+          pkgs.cabal-install
           hls
-          hlint
+          pkgs.hlint
           hpack
         ];
       };
