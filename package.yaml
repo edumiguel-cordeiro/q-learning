@@ -26,6 +26,8 @@ ghc-options:
 
 library:
   source-dirs: src
+  exposed-modules:
+    - Enviroment
 
 executables:
   q-learning-exe:
