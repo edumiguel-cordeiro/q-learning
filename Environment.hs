@@ -1,9 +1,48 @@
 module Environment where
 
-{-
-Integrante 2 — Movimentação do agente
-Arquivo: Environment.hs
+-- Representa um ponto da cidade
+type Ponto = String
 
+-- Representa uma rua (origem, destino, custo)
+type Rua = (Ponto, Ponto, Int)
+
+-- Pontos existentes na cidade
+pontos :: [Ponto]
+pontos = ["A", "B", "C", "D", "E", "F"]
+
+-- Ruas e seus respectivos custos
+ruas :: [Rua]
+ruas =
+    [ ("A", "B", 2)
+    , ("A", "C", 4)
+    , ("B", "D", 2)
+    , ("B", "E", 5)
+    , ("C", "D", 2)
+    , ("C", "E", 2)
+    , ("D", "F", 4)
+    , ("E", "F", 1)
+    ]
+
+-- Ponto inicial e destino
+origem :: Ponto
+origem = "A"
+
+destino :: Ponto
+destino = "F"
+
+-- Consulta o custo de uma rua entre dois pontos
+custoRua :: Ponto -> Ponto -> Maybe Int
+custoRua a b =
+    case [(custo) | (origemRua, destinoRua, custo) <- ruas,
+                    origemRua == a,
+                    destinoRua == b] of
+        [] -> Nothing
+        (c:_) -> Just c
+
+-- =========================================================================
+-- INTEGRANTE 2 — MOVIMENTAÇÃO DO AGENTE
+-- =========================================================================
+{-
 Tarefas:
 - Implementar a lógica de movimentação do entregador.
 - Criar a função que identifica os caminhos disponíveis a partir de determinado ponto.
@@ -15,63 +54,32 @@ Entrega esperada: movimentação funcional, permitindo que o agente percorra o m
 Para apresentação: explicar como o agente identifica as opções de deslocamento e como acontece a mudança entre estados.
 -}
 
--- =========================================================================
--- 1. TIPOS BASEADOS EM CHAR (ALINHAR COM A INTEGRANTE 1 QUANDO ELA SUBIR)
--- =========================================================================
--- Os pontos da cidade (A, B, C, D, E e F) são representados como Char.
-type Ponto = Char
 type Estado = Ponto
-type Custo = Double
 
--- [AJUSTAR COM INTEGRANTE 1]
--- Confira se o tipo/construtor de rua e mapa da Integrante 1 usam estes campos
--- ou se será necessário adaptar o nome do tipo e das funções de acesso.
-data Rua = Rua
-  { origem  :: Ponto
-  , destino :: Ponto
-  , custo   :: Custo
-  } deriving (Show, Eq)
+-- 1. Identificar opções de deslocamento:
+-- Dado um ponto atual, retorna todas as ruas (origem, destino, custo) que saem dele.
+opcoesDeslocamento :: Ponto -> [Rua]
+opcoesDeslocamento pontoAtual =
+    [ rua | rua@(pOrigem, _, _) <- ruas, pOrigem == pontoAtual ]
 
-type Mapa = [Rua]
-
-
--- =========================================================================
--- 2. IDENTIFICAR OPCOES DE DESLOCAMENTO
--- =========================================================================
--- Dado o mapa e o estado/ponto atual ('A'..'F'), retorna as ruas que saem dali.
-opcoesDeslocamento :: Mapa -> Estado -> [Rua]
-opcoesDeslocamento mapa estadoAtual =
-  filter (\rua -> origem rua == estadoAtual) mapa
-
-
--- =========================================================================
--- 3. ESCOLHER UMA RUA DISPONIVEL
--- =========================================================================
--- Recebe as ruas disponíveis e um índice (ex.: 0, 1, ...).
--- Usa 'mod' para garantir que o índice fique dentro do tamanho da lista.
--- Retorna Nothing se não houver ruas disponíveis no ponto atual.
+-- 2. Escolher uma rua disponível:
+-- Recebe a lista de opções e um índice (ex.: 0, 1, ...).
+-- Usa 'mod' para manter o índice dentro da lista e retorna Nothing se não houver opções.
 escolherRua :: [Rua] -> Int -> Maybe Rua
 escolherRua [] _ = Nothing
 escolherRua opcoes idx =
-  let indiceSeguro = idx `mod` length opcoes
-  in Just (opcoes !! indiceSeguro)
+    let indiceSeguro = idx `mod` length opcoes
+    in Just (opcoes !! indiceSeguro)
 
-
--- =========================================================================
--- 4. TRANSICAO DE ESTADO (MUDANCA DE PONTO)
--- =========================================================================
--- Recebe o estado atual (Char) e a rua escolhida, devolvendo o novo estado (Char).
+-- 3. Mudança de estado:
+-- Dado o estado atual e a rua escolhida, retorna o novo estado (ponto de destino).
 moverEstado :: Estado -> Rua -> Estado
-moverEstado _estadoAtual ruaEscolhida = destino ruaEscolhida
+moverEstado _estadoAtual (_, pDestino, _) = pDestino
 
-
--- =========================================================================
--- 5. PASSO COMPLETO DE MOVIMENTACAO (AUXILIAR)
--- =========================================================================
--- Combina busca das opções, escolha segura e mudança de estado.
--- Se não houver rua disponível, permanece no estado atual.
-moverNoMapa :: Mapa -> Estado -> Int -> Estado
-moverNoMapa mapa estadoAtual idx =
-  case escolherRua (opcoesDeslocamento mapa estadoAtual) idx of
-    Nothing  -> estadoAtual
-    Just rua -> moverEstado estadoAtual rua
+-- 4. Auxiliar de um passo completo:
+-- Busca as opções a partir do ponto atual, escolhe uma e avança para o próximo ponto.
+moverNoMapa :: Estado -> Int -> Estado
+moverNoMapa estadoAtual idx =
+    case escolherRua (opcoesDeslocamento estadoAtual) idx of
+        Nothing  -> estadoAtual
+        Just rua -> moverEstado estadoAtual rua
