@@ -67,3 +67,29 @@ moverNoMapa estadoAtual idx =
     case escolherRua (opcoesDeslocamento estadoAtual) idx of
         Nothing  -> estadoAtual
         Just rua -> moverEstado estadoAtual rua
+
+
+
+-- SISTEMA DE RECOMPENSAS E PENALIDADES
+
+bonusDestino :: Int
+bonusDestino = 100
+
+getReward :: Ponto -> Ponto -> Maybe Int
+getReward a b =
+    case custoRua a b of
+        Nothing -> Nothing
+        Just custo ->
+            let penalidade = negate custo
+                bonus = if b == destino
+                        then bonusDestino
+                        else 0
+            in Just (penalidade + bonus)
+
+
+-- ENCERRAMENTO DOS EPISODIOS
+
+episodioTerminado :: Estado -> Bool
+episodioTerminado estadoAtual =
+    estadoAtual == destino
+
