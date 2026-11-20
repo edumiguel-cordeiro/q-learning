@@ -39,20 +39,8 @@ custoRua a b =
         [] -> Nothing
         (c:_) -> Just c
 
--- =========================================================================
--- INTEGRANTE 2 — MOVIMENTAÇÃO DO AGENTE
--- =========================================================================
-{-
-Tarefas:
-- Implementar a lógica de movimentação do entregador.
-- Criar a função que identifica os caminhos disponíveis a partir de determinado ponto.
-- Permitir que o agente escolha uma rua disponível.
-- Implementar a transição de um estado para outro.
 
-Entrega esperada: movimentação funcional, permitindo que o agente percorra o mapa seguindo as conexões disponíveis.
-
-Para apresentação: explicar como o agente identifica as opções de deslocamento e como acontece a mudança entre estados.
--}
+-- MOVIMENTAÇÃO DO AGENTE
 
 type Estado = Ponto
 
