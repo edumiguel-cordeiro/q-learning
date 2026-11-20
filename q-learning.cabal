@@ -1,4 +1,4 @@
-cabal-version: 2.2
+cabal-version: 1.12
 
 -- This file has been generated from package.yaml by hpack version 0.39.1.
 --
@@ -6,19 +6,22 @@ cabal-version: 2.2
 
 name:           q-learning
 version:        0.1.0.0
-author:         Kauã Santana
+homepage:       https://github.com//edumiguel-cordeiro#readme
+bug-reports:    https://github.com//edumiguel-cordeiro/issues
+author:         Eduardo Miguel, Ellen Ozores, Kauã Santana, Mel Yukari, Waleska Mayara, Philip Micael
+maintainer:     Eduardo Miguel, Ellen Ozores, Kauã Santana, Mel Yukari, Waleska Mayara, Philip Micael
 build-type:     Simple
 
 source-repository head
   type: git
-  location: https://github.com//edumiguel-cordeiro/q-learning
+  location: https://github.com//edumiguel-cordeiro
+  subdir: q-learning
 
 library
   exposed-modules:
-      Lib
+      Enviroment
   other-modules:
-      Paths_q_learning
-  autogen-modules:
+      Environment
       Paths_q_learning
   hs-source-dirs:
       src
@@ -30,8 +33,6 @@ library
 executable q-learning-exe
   main-is: Main.hs
   other-modules:
-      Paths_q_learning
-  autogen-modules:
       Paths_q_learning
   hs-source-dirs:
       app
