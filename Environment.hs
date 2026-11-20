@@ -29,3 +29,12 @@ origem = "A"
 
 destino :: Ponto
 destino = "F"
+
+-- Consulta o custo de uma rua entre dois pontos
+custoRua :: Ponto -> Ponto -> Maybe Int
+custoRua a b =
+    case [(custo) | (origemRua, destinoRua, custo) <- ruas,
+                    origemRua == a,
+                    destinoRua == b] of
+        [] -> Nothing
+        (c:_) -> Just c
