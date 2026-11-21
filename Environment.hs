@@ -4,6 +4,7 @@ module Environment
     , opcoesDeslocamento
     , ruas
     , getReward
+    , origem
     ) where
 
 -- Representa um ponto da cidade
