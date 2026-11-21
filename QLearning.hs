@@ -1,1 +1,48 @@
-{-echo Integrante 5 - Exploracao e treinamentoecho Arquivo: QLearning.hsecho.echo Tarefas:echo - Implementar a estrategia Epsilon-Greedy.echo - Definir como o agente escolhe entre explorar novos caminhos e aproveitar o conhecimento adquirido.echo - Implementar o processo de treinamento por episodios.echo - Integrar o treinamento com a tabela Q e as funcoes do ambiente.echo.echo Entrega esperada: processo de treinamento funcional, permitindo que o agente aprenda a escolher melhores caminhos ao longo dos episodios.echo.echo Para apresentacao: explicar o funcionamento do Epsilon-Greedy, a diferenca entre exploracao e aproveitamento e como ocorre o treinamento.echo -}
+module QLearning
+    ( Acao
+    , TabelaQ
+    , inicializarTabela
+    , valorQ
+    , maxValorQ
+    , atualizarQ
+    , alphaPadrao
+    , gammaPadrao
+    ) where
+
+import Data.Map.Strict (insert, fromList, findWithDefault, Map)
+import Environment (Estado, episodioTerminado, opcoesDeslocamento, ruas)
+
+-- tabela
+type Acao    = Estado
+type TabelaQ = Map (Estado, Acao) Double
+
+-- parâmetros
+alphaPadrao :: Double
+alphaPadrao = 0.1
+
+gammaPadrao :: Double
+gammaPadrao = 0.9
+
+-- atualização
+atualizarQ :: Double -> Double -> TabelaQ -> Estado -> Acao -> Double -> Estado -> TabelaQ
+atualizarQ alpha gamma tabela estado acao recompensa proximoEstado =
+    insert (estado, acao) novoValor tabela
+  where
+    valorAtual = valorQ tabela estado acao
+    alvo = recompensa + gamma * maxValorQ tabela proximoEstado
+    novoValor = valorAtual + alpha * (alvo - valorAtual)        -- Q(s, a) = Q(s, a) + alpha * (r + gamma * max Q(s', a') - Q(s, a))
+
+-- funções úteis
+inicializarTabela :: TabelaQ
+inicializarTabela = fromList [ ((origemRua, destinoRua), 0) | (origemRua, destinoRua, _) <- ruas]
+
+valorQ :: TabelaQ -> Estado -> Acao -> Double
+valorQ tabela estado acao = findWithDefault 0 (estado, acao) tabela
+
+maxValorQ :: TabelaQ -> Estado -> Double
+maxValorQ tabela estado
+    | episodioTerminado estado = 0
+    | null acoes = 0
+    | otherwise = maximum [ valorQ tabela estado acao | acao <- acoes ]
+  where
+    acoes = [ destinoRua | (_, destinoRua, _) <- opcoesDeslocamento estado ]
