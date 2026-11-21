@@ -85,3 +85,46 @@ escolherAcao epsilon tabela estado semente
     s2     = proximaSemente s1
     n      = length acoes
     indice = min (n - 1) (floor (sorteio s2 * fromIntegral n))
+
+
+-- TREINAMENTO 
+data Config = Config
+    { cfgEpisodios :: Int
+    , cfgAlpha     :: Double
+    , cfgGamma     :: Double
+    , cfgEpsilon   :: Double
+    , cfgMaxPassos :: Int
+    }
+
+configPadrao :: Config
+configPadrao = Config
+    { cfgEpisodios = 1000
+    , cfgAlpha     = alphaPadrao
+    , cfgGamma     = gammaPadrao
+    , cfgEpsilon   = 0.3
+    , cfgMaxPassos = 20
+    }
+
+executarEpisodio :: Config -> TabelaQ -> Semente -> (TabelaQ, Semente)
+executarEpisodio cfg tabelaInicial sementeInicial =
+    passo origem tabelaInicial sementeInicial 0
+  where
+    passo estado tabela semente n
+        | episodioTerminado estado || n >= cfgMaxPassos cfg = (tabela, semente)
+        | otherwise =
+            case escolherAcao (cfgEpsilon cfg) tabela estado semente of
+                (Nothing, s')   -> (tabela, s')
+                (Just acao, s') ->
+                    case getReward estado acao of
+                        Nothing -> (tabela, s')
+                        Just recompensa ->
+                            let novaTabela = atualizarQ (cfgAlpha cfg) (cfgGamma cfg)
+                                                        tabela estado acao 
+                                                        (fromIntegral recompensa) acao
+                            in passo acao novaTabela s' (n + 1)
+
+treinar :: Config -> Semente -> TabelaQ
+treinar cfg semente =
+    fst (foldl' umEpisodio (inicializarTabela, semente) [1 .. cfgEpisodios cfg])
+  where
+    umEpisodio (tabela, s) _ = executarEpisodio cfg tabela s
