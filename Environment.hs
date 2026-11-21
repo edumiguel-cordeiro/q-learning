@@ -1,4 +1,10 @@
-module Environment where
+module Environment
+    ( Estado
+    , episodioTerminado
+    , opcoesDeslocamento
+    , ruas
+    , getReward
+    ) where
 
 -- Representa um ponto da cidade
 type Ponto = String
@@ -33,42 +39,44 @@ destino = "F"
 -- Consulta o custo de uma rua entre dois pontos
 custoRua :: Ponto -> Ponto -> Maybe Int
 custoRua a b =
-    case [custo | (origemRua, destinoRua, custo) <- ruas,
-                  origemRua == a,
-                  destinoRua == b] of
+    case [(custo) | (origemRua, destinoRua, custo) <- ruas,
+                    origemRua == a,
+                    destinoRua == b] of
         [] -> Nothing
         (c:_) -> Just c
 
 
--- MOVIMENTACAO DO AGENTE
+-- MOVIMENTAÇÃO DO AGENTE
 
 type Estado = Ponto
 
--- Identifica as opcoes de deslocamento
+-- 1. Identificar opções de deslocamento:
+-- Dado um ponto atual, retorna todas as ruas (origem, destino, custo) que saem dele.
 opcoesDeslocamento :: Ponto -> [Rua]
 opcoesDeslocamento pontoAtual =
-    [rua | rua@(pOrigem, _, _) <- ruas,
-           pOrigem == pontoAtual]
+    [ rua | rua@(pOrigem, _, _) <- ruas, pOrigem == pontoAtual ]
 
--- Escolhe uma rua disponivel
+-- 2. Escolher uma rua disponível:
+-- Recebe a lista de opções e um índice (ex.: 0, 1, ...).
+-- Usa 'mod' para manter o índice dentro da lista e retorna Nothing se não houver opções.
 escolherRua :: [Rua] -> Int -> Maybe Rua
 escolherRua [] _ = Nothing
 escolherRua opcoes idx =
     let indiceSeguro = idx `mod` length opcoes
     in Just (opcoes !! indiceSeguro)
 
--- Realiza a mudanca de estado
+-- 3. Mudança de estado:
+-- Dado o estado atual e a rua escolhida, retorna o novo estado (ponto de destino).
 moverEstado :: Estado -> Rua -> Estado
-moverEstado _ (_, pDestino, _) = pDestino
+moverEstado _estadoAtual (_, pDestino, _) = pDestino
 
--- Realiza um passo completo
+-- 4. Auxiliar de um passo completo:
+-- Busca as opções a partir do ponto atual, escolhe uma e avança para o próximo ponto.
 moverNoMapa :: Estado -> Int -> Estado
 moverNoMapa estadoAtual idx =
     case escolherRua (opcoesDeslocamento estadoAtual) idx of
         Nothing  -> estadoAtual
         Just rua -> moverEstado estadoAtual rua
-
-
 
 -- SISTEMA DE RECOMPENSAS E PENALIDADES
 
@@ -85,7 +93,6 @@ getReward a b =
                         then bonusDestino
                         else 0
             in Just (penalidade + bonus)
-
 
 -- ENCERRAMENTO DOS EPISODIOS
 
