@@ -34,6 +34,7 @@ library
 executable q-learning-exe
   main-is: Main.hs
   other-modules:
+      Printing
       Paths_q_learning
   hs-source-dirs:
       app

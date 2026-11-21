@@ -16,10 +16,10 @@ module QLearning
     , treinar
     ) where
 
-import Data.List (foldl', maximumBy)
+import Data.List       (foldl', maximumBy)
 import Data.Map.Strict (insert, fromList, findWithDefault, Map)
-import Data.Ord (comparing)
-import Environment (Estado, episodioTerminado, opcoesDeslocamento, ruas, getReward, origem)
+import Data.Ord        (comparing)
+import Environment     (Estado, episodioTerminado, opcoesDeslocamento, ruas, getReward, origem)
 
 -- tabela
 type Acao    = Estado
@@ -57,7 +57,7 @@ maxValorQ tabela estado
     acoes = [ destinoRua | (_, destinoRua, _) <- opcoesDeslocamento estado ]
 
 
--- EPSILON-GREEDY 
+-- EPSILON-GREEDY
 type Semente = Int
 
 proximaSemente :: Semente -> Semente
@@ -77,8 +77,8 @@ melhorAcao tabela estado
 escolherAcao :: Double -> TabelaQ -> Estado -> Semente -> (Maybe Acao, Semente)
 escolherAcao epsilon tabela estado semente
     | null acoes = (Nothing, s2)
-    | sorteio s1 < epsilon = (Just (acoes !! indice), s2)   
-    | otherwise = (melhorAcao tabela estado, s2)            
+    | sorteio s1 < epsilon = (Just (acoes !! indice), s2)
+    | otherwise = (melhorAcao tabela estado, s2)
   where
     acoes  = [ d | (_, d, _) <- opcoesDeslocamento estado ]
     s1     = proximaSemente semente
@@ -87,7 +87,7 @@ escolherAcao epsilon tabela estado semente
     indice = min (n - 1) (floor (sorteio s2 * fromIntegral n))
 
 
--- TREINAMENTO 
+-- TREINAMENTO
 data Config = Config
     { cfgEpisodios :: Int
     , cfgAlpha     :: Double
@@ -119,7 +119,7 @@ executarEpisodio cfg tabelaInicial sementeInicial =
                         Nothing -> (tabela, s')
                         Just recompensa ->
                             let novaTabela = atualizarQ (cfgAlpha cfg) (cfgGamma cfg)
-                                                        tabela estado acao 
+                                                        tabela estado acao
                                                         (fromIntegral recompensa) acao
                             in passo acao novaTabela s' (n + 1)
 
