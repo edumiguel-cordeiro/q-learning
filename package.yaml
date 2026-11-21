@@ -12,6 +12,7 @@ author:              "Eduardo Miguel, Ellen Ozores, Kauã Santana, Mel Yukari, W
 # common to point users to the README.md file.
 dependencies:
 - base >= 4.7 && < 5
+- containers
 
 ghc-options:
 - -Wall
@@ -27,7 +28,8 @@ ghc-options:
 library:
   source-dirs: src
   exposed-modules:
-    - Enviroment
+    - Environment
+    - QLearning
 
 executables:
   q-learning-exe:

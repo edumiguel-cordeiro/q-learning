@@ -1,4 +1,10 @@
-module Environment where
+module Environment
+    ( Estado
+    , episodioTerminado
+    , opcoesDeslocamento
+    , ruas
+    , getReward
+    ) where
 
 -- Representa um ponto da cidade
 type Ponto = String
