@@ -16,7 +16,7 @@ module QLearning
     , treinar
     ) where
 
-import Data.List       (foldl', maximumBy)
+import Data.List       (maximumBy)
 import Data.Map.Strict (insert, fromList, findWithDefault, Map)
 import Data.Ord        (comparing)
 import Environment     (Estado, episodioTerminado, opcoesDeslocamento, ruas, getReward, origem)
@@ -127,4 +127,9 @@ treinar :: Config -> Semente -> TabelaQ
 treinar cfg semente =
     fst (foldl' umEpisodio (inicializarTabela, semente) [1 .. cfgEpisodios cfg])
   where
-    umEpisodio (tabela, s) _ = executarEpisodio cfg tabela s
+    umEpisodio (tabela, s) episodio =
+        let ultimoEpisodio = max 1 (cfgEpisodios cfg)
+            progresso = fromIntegral (episodio - 1) / fromIntegral ultimoEpisodio
+            epsilonAtual = cfgEpsilon cfg * (1 - progresso) + 0.05 * progresso
+            cfgAtual = cfg { cfgEpsilon = epsilonAtual }
+        in executarEpisodio cfgAtual tabela s
