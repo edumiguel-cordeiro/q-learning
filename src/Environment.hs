@@ -5,6 +5,7 @@ module Environment
     , ruas
     , getReward
     , origem
+    , destino
     ) where
 
 -- Representa um ponto da cidade
@@ -12,10 +13,6 @@ type Ponto = String
 
 -- Representa uma rua (origem, destino, custo)
 type Rua = (Ponto, Ponto, Int)
-
--- Pontos existentes na cidade
-pontos :: [Ponto]
-pontos = ["A", "B", "C", "D", "E", "F"]
 
 -- Ruas e seus respectivos custos
 ruas :: [Rua]
@@ -48,7 +45,6 @@ custoRua a b =
 
 
 -- MOVIMENTAÇÃO DO AGENTE
-
 type Estado = Ponto
 
 -- 1. Identificar opções de deslocamento:
@@ -57,30 +53,7 @@ opcoesDeslocamento :: Ponto -> [Rua]
 opcoesDeslocamento pontoAtual =
     [ rua | rua@(pOrigem, _, _) <- ruas, pOrigem == pontoAtual ]
 
--- 2. Escolher uma rua disponível:
--- Recebe a lista de opções e um índice (ex.: 0, 1, ...).
--- Usa 'mod' para manter o índice dentro da lista e retorna Nothing se não houver opções.
-escolherRua :: [Rua] -> Int -> Maybe Rua
-escolherRua [] _ = Nothing
-escolherRua opcoes idx =
-    let indiceSeguro = idx `mod` length opcoes
-    in Just (opcoes !! indiceSeguro)
-
--- 3. Mudança de estado:
--- Dado o estado atual e a rua escolhida, retorna o novo estado (ponto de destino).
-moverEstado :: Estado -> Rua -> Estado
-moverEstado _estadoAtual (_, pDestino, _) = pDestino
-
--- 4. Auxiliar de um passo completo:
--- Busca as opções a partir do ponto atual, escolhe uma e avança para o próximo ponto.
-moverNoMapa :: Estado -> Int -> Estado
-moverNoMapa estadoAtual idx =
-    case escolherRua (opcoesDeslocamento estadoAtual) idx of
-        Nothing  -> estadoAtual
-        Just rua -> moverEstado estadoAtual rua
-
 -- SISTEMA DE RECOMPENSAS E PENALIDADES
-
 bonusDestino :: Int
 bonusDestino = 100
 
