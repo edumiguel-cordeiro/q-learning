@@ -1,8 +1,9 @@
 module Printing (imprimirResultado) where
 
-import Data.List   (intercalate)
-import Environment (Estado, getReward, ruas)
-import QLearning   (Config(..), TabelaQ, valorQ)
+import Data.List       (intercalate)
+import Data.Map.Strict (toAscList)
+import Environment     (Estado, getReward, ruas)
+import QLearning       (Config(..), TabelaQ, valorQ)
 
 -- funções de impressão para o Main
 imprimirResultado :: Config -> TabelaQ -> Maybe ([Estado], Int) -> IO ()
@@ -13,7 +14,7 @@ imprimirResultado config tabela rota = do
     putStrLn ("Fator de desconto: " ++ show (cfgGamma config))
     putStrLn ""
     putStrLn "Tabela Q aprendida:"
-    print tabela
+    mapM_ imprimirValorQ (toAscList tabela)
 
     case rota of
         Nothing ->
@@ -25,6 +26,10 @@ imprimirResultado config tabela rota = do
             putStrLn "Recompensas por deslocamento:"
             imprimirDeslocamentos tabela estados
             putStrLn ("Recompensa total da rota: " ++ show recompensaTotal)
+
+imprimirValorQ :: ((Estado, Estado), Double) -> IO ()
+imprimirValorQ ((estado, acao), valor) =
+    putStrLn ("  " ++ estado ++ " -> " ++ acao ++ ": " ++ show valor)
 
 imprimirMapa :: [Estado] -> IO ()
 imprimirMapa rota =
