@@ -42,3 +42,11 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - q-learning
+
+tests:
+  q-learning-test:
+    main:                Spec.hs
+    source-dirs:         test
+    dependencies:
+    - base
+    - q-learning
